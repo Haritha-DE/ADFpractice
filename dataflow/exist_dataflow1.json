@@ -1,0 +1,68 @@
+{
+	"name": "exist_dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "EmployeeDelimitedText1",
+						"type": "DatasetReference"
+					},
+					"name": "emp"
+				},
+				{
+					"dataset": {
+						"referenceName": "DepatmentDelimitedText2",
+						"type": "DatasetReference"
+					},
+					"name": "dept"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "outputdelimitedtxt",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "exists1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          empid as string,",
+				"          name as string,",
+				"          country as string,",
+				"          department as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> emp",
+				"source(output(",
+				"          deptid as string,",
+				"          deptname as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> dept",
+				"emp, dept exists(department == deptid,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> exists1",
+				"exists1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['notexistdept'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

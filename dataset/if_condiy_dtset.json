@@ -1,0 +1,27 @@
+{
+	"name": "if_condiy_dtset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage_linkedservice",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"outputFolder": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().outputFolder",
+					"type": "Expression"
+				},
+				"fileSystem": "adf-demo"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

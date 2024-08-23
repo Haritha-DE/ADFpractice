@@ -1,0 +1,60 @@
+{
+	"name": "flatten_dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Json1",
+						"type": "DatasetReference"
+					},
+					"name": "epsource1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "outputdelimitedtxt",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          employees as (userName as string, jobTitleName as string, employeeCode as string, techstack as string[], emailAddress as string, image as string)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'singleDocument') ~> epsource1",
+				"epsource1 foldDown(unrollMultiple(employees,employees.techstack),",
+				"     mapColumn(",
+				"          userName = employees.userName,",
+				"          jobTitleName = employees.jobTitleName,",
+				"          employeeCode = employees.employeeCode,",
+				"          techstack = employees.techstack,",
+				"          emailAddress = employees.emailAddress,",
+				"          image = employees.image",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['empjson'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

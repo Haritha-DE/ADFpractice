@@ -1,0 +1,73 @@
+{
+	"name": "alter_row_dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "empnew_pivot_DelimitedText1",
+						"type": "DatasetReference"
+					},
+					"name": "emp"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "dbsink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          empid as integer,",
+				"          name as string,",
+				"          gender as string,",
+				"          country as string,",
+				"          salary as integer,",
+				"          department as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> emp",
+				"emp alterRow(deleteIf(department=='Payroll'),",
+				"     updateIf(department=='HR')) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          employee_id as integer,",
+				"          name as string,",
+				"          gender as string,",
+				"          country as string,",
+				"          salary as integer,",
+				"          department as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['employee_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          employee_id = empid,",
+				"          name,",
+				"          gender,",
+				"          country,",
+				"          salary,",
+				"          department",
+				"     )) ~> dbsink"
+			]
+		}
+	}
+}

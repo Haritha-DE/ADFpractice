@@ -1,0 +1,59 @@
+{
+	"name": "unpivot_dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "unpivotDelimitedText1",
+						"type": "DatasetReference"
+					},
+					"name": "textsource1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "outputdelimitedtxt",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "unpivot1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          PO as string,",
+				"          Vender as string,",
+				"          Apple as string,",
+				"          Mango as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> textsource1",
+				"textsource1 unpivot(output(",
+				"          Fruits as string,",
+				"          Amount as string",
+				"     ),",
+				"     ungroupBy(PO,",
+				"          Vender),",
+				"     lateral: true,",
+				"     ignoreNullPivots: false) ~> unpivot1",
+				"unpivot1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['unpivot_text'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

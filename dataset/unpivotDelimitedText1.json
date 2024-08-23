@@ -1,0 +1,42 @@
+{
+	"name": "unpivotDelimitedText1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage_linkedservice",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "text.csv",
+				"folderPath": "input",
+				"fileSystem": "adf-demo"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "PO",
+				"type": "String"
+			},
+			{
+				"name": "Vender",
+				"type": "String"
+			},
+			{
+				"name": "Apple",
+				"type": "String"
+			},
+			{
+				"name": "Mango",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

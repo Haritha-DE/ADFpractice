@@ -1,0 +1,28 @@
+{
+	"name": "powerquery1",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "empnew_pivot_DelimitedText1",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> empnew_pivot_DelimitedText1",
+					"dataset": {
+						"referenceName": "empnew_pivot_DelimitedText1",
+						"type": "DatasetReference"
+					}
+				},
+				{
+					"name": "DepatmentDelimitedText2",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> DepatmentDelimitedText2",
+					"dataset": {
+						"referenceName": "DepatmentDelimitedText2",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"script": "section Section1;\r\nshared empnew_pivot_DelimitedText1 = let AdfDoc = AzureStorage.DataLakeContents(\"https://practice123.dfs.core.windows.net/adf-demo/input/employeenew.csv\"),Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]), PromotedHeaders = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]) in  PromotedHeaders;\r\nshared DepatmentDelimitedText2 = let AdfDoc = AzureStorage.DataLakeContents(\"https://practice123.dfs.core.windows.net/adf-demo/input/department.csv\"),Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]) in  Csv;\r\nshared UserQuery = let Source = #\"empnew_pivot_DelimitedText1\",\r\n  #\"Grouped rows\" = Table.Group(Source, {\"department\"}, {{\"Count\", each Table.RowCount(_), Int64.Type}}) in #\"Grouped rows\";\r\n",
+			"documentLocale": "en-us"
+		}
+	}
+}
